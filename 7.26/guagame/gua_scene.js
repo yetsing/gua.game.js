@@ -1,7 +1,7 @@
 class GuaScene {
     constructor(game) {
         this.game = game
-        this.debugModeEnabled = false
+        this.debugModeEnabled = game.debugModeEnabled
         this.elements = []
     }
     static new(game) {
@@ -19,8 +19,6 @@ class GuaScene {
         }
     }
     update() {
-        var debugCheckBox = document.querySelector('#id-debug-mode')
-        this.debugModeEnabled = debugCheckBox.checked.value
         if (this.debugModeEnabled) {
             for (var i = 0; i < this.elements.length; i++) {
                 var e = this.elements[i]
