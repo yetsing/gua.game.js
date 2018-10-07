@@ -1,105 +1,3 @@
-class Bullet extends GuaImage {
-    constructor(game) {
-        super(game, 'bullet')
-        this.setup()
-    }
-    setup() {
-        this.speed = 2
-    }
-    update() {
-        this.y -= this.speed
-    }
-    debug() {
-        this.speed = config.bullet_speed
-    }
-}
-
-class Player extends GuaImage {
-    constructor(game) {
-        super(game, 'player')
-        this.setup()
-    }
-    setup() {
-        this.speed = 10
-        this.cooldown = 0
-    }
-    update() {
-        if (this.cooldown > 0) {
-            this.cooldown--
-        }
-    }
-    debug() {
-        this.speed = config.player_speed
-    }
-    fire() {
-        if (this.cooldown == 0) {
-            this.cooldown = config.fire_cooldown
-            var x = this.x + this.w / 2
-            var y = this.y
-            var b = Bullet.new(this.game)
-            b.x = x - b.w / 2
-            b.y = y - b.h
-            this.scene.addElement(b)
-        }
-    }
-    moveLeft() {
-        this.x -= this.speed
-    }
-    moveRight() {
-        this.x += this.speed
-    }
-    moveUp() {
-        this.y -= this.speed
-    }
-    moveDown() {
-        this.y += this.speed
-    }
-}
-
-class Enemy extends GuaImage {
-    constructor(game) {
-        var type = randomBetween(0, 2)
-        var name = 'enemy' + type
-        super(game, name)
-        this.setup()
-    }
-    setup() {
-        this.x = randomBetween(0, 350)
-        this.y = -randomBetween(0, 200)
-        this.speed = randomBetween(2, 5)
-    }
-    update() {
-        this.y += this.speed
-        if (this.y > 600) {
-            this.setup()
-        }
-    }
-    debug() {
-        this.speed = config.enemy_speed
-    }
-}
-
-class Cloud extends GuaImage {
-    constructor(game) {
-        super(game, 'cloud')
-        this.setup()
-    }
-    setup() {
-        this.x = randomBetween(0, 350)
-        this.y = -randomBetween(0, 200)
-        this.speed = 1
-    }
-    update() {
-        this.y += this.speed
-        if (this.y > 600) {
-            this.setup()
-        }
-    }
-    debug() {
-        this.speed = config.cloud_speed
-    }
-}
-
 class Scene extends GuaScene {
     constructor(game) {
         super(game)
@@ -111,23 +9,22 @@ class Scene extends GuaScene {
         this.player = Player.new(this.game)
         this.numberOfEnemies = 6
         this.cloud = Cloud.new(this.game)
-        this.player.x = 100
-        this.player.y = 150
+        this.scoreLabel = ScoreLabel.new(this.game)
+        this.enemies = []
 
-        this.addElement(this.bg)
-        this.addElement(this.cloud)
+        // this.addElement(this.bg)
+        // this.addElement(this.cloud)
         this.addElement(this.player)
+        this.addElement(this.scoreLabel)
 
-        this.addEnemies()
+        this.addEnemies(this.numberOfEnemies)
     }
-    addEnemies() {
-        var es = []
-        for (var i = 0; i < this.numberOfEnemies; i++) {
+    addEnemies(numberOfEnemies) {
+        for (var i = 0; i < numberOfEnemies; i++) {
             var e = Enemy.new(this.game)
-            es.push(e)
+            this.enemies.push(e)
             this.addElement(e)
         }
-        this.enemies = es
     }
     setupInputs() {
         var g = this.game
@@ -148,8 +45,42 @@ class Scene extends GuaScene {
             s.player.fire()
         })
     }
+    hit() {
+        var bullets = this.player.bullets
+        var enemies = this.enemies
+        for (var b of bullets) {
+            for (var e of enemies) {
+                if(rectIntersects(e, b)) {
+                    log('hit succcess')
+                    e.dead = true
+                    b.dead = true
+                    this.scoreLabel.score += 20
+                }
+            }
+        }
+        this.removeDeadEnemy()
+        this.player.removeBullet()
+    }
+    removeDeadEnemy() {
+        var es = []
+        var n = 0
+        for (var e of this.enemies) {
+            if (e.dead) {
+                n += 1
+                var x = e.x + e.w / 2
+                var y = e.y + e.h /2
+                var ps = GuaParticleSystem.new(this.game, x, y)
+                this.addElement(ps)
+            } else {
+                es.push(e)
+            }
+        }
+        this.enemies = es
+        this.addEnemies(n)
+    }
     update() {
         super.update()
         this.cloud.y += 1
+        this.hit()
     }
 }

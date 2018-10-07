@@ -23,7 +23,7 @@ var insertDebugBox = function() {
     debugBox.insertAdjacentHTML('beforeend', t)
 
     var setting = Object.keys(config)
-    log(setting)
+    // log(setting)
     for (var i = 0; i < setting.length; i++) {
         var s = setting[i]
         var t = `

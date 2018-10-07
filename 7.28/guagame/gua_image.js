@@ -6,6 +6,7 @@ class GuaImage {
         this.y = 0
         this.w = this.texture.width
         this.h = this.texture.height
+        this.dead = false
     }
     static new(game, name) {
         var i = new this(game, name)

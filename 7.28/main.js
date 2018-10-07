@@ -10,8 +10,8 @@ var __main = function() {
         fire: 'img/fire.png',
     }
     var game = GuaGame.instance(30, images, function(g){
-        // var s = Scene.new(g)
-        var s = SceneTitle.new(g)
+        var s = Scene.new(g)
+        // var s = SceneTitle.new(g)
         g.runWithScene(s)
     })
 

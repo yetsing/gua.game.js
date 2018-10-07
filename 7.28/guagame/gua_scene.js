@@ -17,6 +17,16 @@ class GuaScene {
             e.draw()
         }
     }
+    removeDeadElement() {
+        var es = []
+        for (var i = 0; i < this.elements.length; i++) {
+            var e = this.elements[i]
+            if (!e.dead) {
+                es.push(e)
+            }
+        }
+        this.elements = es
+    }
     update() {
         if (this.debugModeEnabled) {
             for (var i = 0; i < this.elements.length; i++) {
@@ -24,12 +34,10 @@ class GuaScene {
                 e.debug && e.debug()
             }
         }
+        this.removeDeadElement()
         for (var i = 0; i < this.elements.length; i++) {
             var e = this.elements[i]
             e.update()
-            if (e.dead()) {
-                this.elements.pop(e)
-            }
         }
     }
 }
