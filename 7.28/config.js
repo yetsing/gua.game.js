@@ -15,3 +15,12 @@ const configName = {
     fireCooldown: '子弹冷却时间',
     particleSpeed: '粒子初速',
 }
+
+const animationConfig = {
+    explosion: {
+        startX: 0,
+        startY: 0,
+        sWidth: 73,
+        sHeight: 72
+    }
+}

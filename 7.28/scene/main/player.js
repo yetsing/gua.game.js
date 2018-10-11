@@ -32,16 +32,24 @@ class Player extends GuaImage {
     }
     moveLeft() {
         // log('move left')
-        this.x -= this.speed
+        if (this.x > 0) {
+            this.x -= this.speed
+        }
     }
     moveRight() {
-        this.x += this.speed
+        if (this.x < 368) {
+            this.x += this.speed
+        }
     }
     moveUp() {
-        this.y -= this.speed
+        if (this.y > 0) {
+            this.y -= this.speed
+        }
     }
     moveDown() {
-        this.y += this.speed
+        if (this.y < 568) {
+            this.y += this.speed
+        }
     }
     removeBullet() {
         var bs = []

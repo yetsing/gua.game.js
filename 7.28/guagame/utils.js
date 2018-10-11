@@ -9,13 +9,14 @@ var imageFromPath = function(path) {
 }
 
 var rectIntersects = function(a, b) {
-    var o = a
-    if (b.y > o.y && b.y < o.y + o.h) {
-        if (b.x > o.x && b.x < o.x + o.w) {
-            return true
-        }
+    var up = a.y + a.h < b.y
+    var bottom = a.y > b.y + b.h
+    var left = a.x + a.w < b.x
+    var right = a.x > b.x + b.w
+    if (up || bottom || left || right) {
+        return false
     }
-    return false
+    return true
 }
 
 const randomBetween = function(start, end) {
