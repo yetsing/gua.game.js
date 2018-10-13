@@ -6,6 +6,8 @@ class GuaGame {
         this.runCallback = runCallback
         //
         this.debugModeEnabled = false
+        this.end = false
+        this.paused = true
         this.scene = null
         this.actions = {}
         this.keydowns = {}
@@ -31,6 +33,9 @@ class GuaGame {
     }
     // update
     update() {
+        if (window.paused) {
+            return
+        }
         this.scene.update()
     }
     // draw

@@ -1,12 +1,12 @@
 class GuaLabel {
-    constructor(game) {
+    constructor(game, text) {
         this.game = game
-        this.text = ''
-        this.x = 0
-        this.y = 0
+        this.text = text
+        this.x = 110
+        this.y = 110
     }
-    static new(game) {
-        return new this(game)
+    static new(game, text) {
+        return new this(game, text)
     }
     update() {
 

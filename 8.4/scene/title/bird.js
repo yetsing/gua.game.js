@@ -16,6 +16,9 @@ class Bird extends GuaAnimation {
     }
     update() {
         super.update()
+        if (this.game.paused) {
+            return
+        }
         this.y += this.vy
         this.vy += this.gy * 0.2
         var h = 480
@@ -23,7 +26,7 @@ class Bird extends GuaAnimation {
             this.y = h
         }
         // this.rotation += 5
-        if (this.rotation <= 45) {
+        if (this.rotation <= 90) {
             this.rotation += 5
         }
     }

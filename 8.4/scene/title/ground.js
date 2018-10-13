@@ -17,6 +17,9 @@ class Ground {
         }
     }
     update() {
+        if (this.game.end) {
+            return
+        }
         this.skipCount--
         var offset = 5
         if (this.skipCount == 0) {

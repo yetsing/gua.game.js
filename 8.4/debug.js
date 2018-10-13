@@ -1,16 +1,6 @@
 var es = sel => document.querySelectorAll(sel)
 
-var bindAll = function(sel, eventName, callback) {
-    var l = es(sel)
-    for (var i = 0; i < l.length; i++) {
-        var input = l[i]
-        input.addEventListener(eventName, function(event) {
-            callback(event)
-        })
-    }
-}
-
-var insertDebugBox = function() {
+var fpsControl = function() {
     var debugBox = document.querySelector('#id-debug-box')
     var t = `
         <div>
@@ -21,7 +11,17 @@ var insertDebugBox = function() {
         </div>
     `
     debugBox.insertAdjacentHTML('beforeend', t)
+    document.querySelector('#id-input-speed').addEventListener('input', function(event) {
+        var input = event.target
+        // log(event, input.value)
+        window.fps = Number(input.value)
+        var fpsLabel = document.querySelector('span')
+        fpsLabel.innerText = window.fps
+    })
+}
 
+var insertDebugBox = function() {
+    var debugBox = document.querySelector('#id-debug-box')
     var items = Object.keys(pipeConfig)
     // log(setting)
     for (var i = 0; i < items.length; i++) {
@@ -42,9 +42,32 @@ var insertDebugBox = function() {
     }
 }
 
+var bindAll = function(sel, eventName, callback) {
+    var l = es(sel)
+    for (var i = 0; i < l.length; i++) {
+        var input = l[i]
+        input.addEventListener(eventName, function(event) {
+            callback(event)
+        })
+    }
+}
+
+var bindEvents = function() {
+    bindAll('.gua-auto-slider', 'input', function(event) {
+        var target = event.target
+        var bindVar = target.dataset.value
+        var v = target.value
+        eval(bindVar + '.value =' + v)
+        var label = target.closest('label').querySelector('.gua-label')
+        label.innerText = v
+    })
+}
+
 var enableDebugMode = function(game) {
     game.debugModeEnabled = true
     window.paused = false
+    // 控制帧率
+    fpsControl()
     window.addEventListener('keydown', function(event){
         var k = event.key
         if (k == 'p') {
@@ -57,20 +80,5 @@ var enableDebugMode = function(game) {
     })
 
     insertDebugBox()
-    bindAll('.gua-auto-slider', 'input', function(event) {
-        var target = event.target
-        var bindVar = target.dataset.value
-        var v = target.value
-        eval(bindVar + '.value =' + v)
-        var label = target.closest('label').querySelector('.gua-label')
-        label.innerText = v
-    })
-    // 控制帧率
-    document.querySelector('#id-input-speed').addEventListener('input', function(event) {
-        var input = event.target
-        // log(event, input.value)
-        window.fps = Number(input.value)
-        var fpsLabel = document.querySelector('span')
-        fpsLabel.innerText = window.fps
-    })
+    bindEvents()
 }

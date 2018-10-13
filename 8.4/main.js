@@ -5,6 +5,8 @@ var __main = function() {
         bird: 'img/bird.png',
         pipe_bottom: 'img/pipe_bottom.png',
         pipe_top: 'img/pipe_top.png',
+        score: 'img/number.png',
+        scoreboard: 'img/scoreboard.png',
     }
     var game = GuaGame.instance(30, images, function(g){
         // var s = Scene.new(g)
