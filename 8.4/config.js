@@ -48,7 +48,15 @@ const pipeConfig = {
     best_y: {
         _comment: '最好分数y',
         value: 320,
-    }
+    },
+    medal_x: {
+        _comment: '奖牌x坐标',
+        value: 200,
+    },
+    medal_y: {
+        _comment: '奖牌y坐标',
+        value: 300,
+    },
 }
 
 bestScore = 0

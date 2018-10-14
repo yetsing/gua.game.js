@@ -67,7 +67,7 @@ class SceneTitle extends GuaScene {
     gameOver() {
         this.game.end = true
         this.updateBest()
-        this.scoreBoard.addScore(this.score.value)
+        this.scoreBoard.addScoreAndMedal(this.score.value)
     }
     update() {
         super.update()
