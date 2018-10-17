@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>guario</title>
+        <style media="screen">
+            canvas {
+                border: dashed 1px lightskyblue;
+            }
+        </style>
+    </head>
+    <body>
+        <h3></h3>
+        <canvas id="id-canvas" data-action="draw_tile" data-type="source"
+        width="640" height="640"></canvas>
+        <canvas id="id-canvas-tile" data-action="draw_tile" data-type="tile"
+        width="96" height="96"></canvas>
+        <div class="gua-control">
+            <button data-action="change_offset" data-offset="-1024">-1024</button>
+            <button data-action="change_offset" data-offset="-16">-16</button>
+            <button data-action="change_offset" data-offset="16">16</button>
+            <button data-action="change_offset" data-offset="1024">1024</button>
+            <button data-action="clear_canvas">clear tile</button>
+            <input data-action="flip" type="checkbox" name="flipX" autocomplete="off">X轴翻转</input>
+            <input data-action="flip" type="checkbox" name="flipY" autocomplete="off">Y轴翻转</input>
+            <label> 颜色方案:</label>
+            <select class="color-select" autocomplete="off">
+                <option value="mario" selected="selected">mario</option>
+                <option value="groud">groud</option>
+                <option value="brick">brick</option>
+                <option value="question_mark">question_mark</option>
+                <option value="cloud">cloud</option>
+                <option value="grass">grass</option>
+            </select>
+        </div>
+        <div class="gua-control"></div>
+        <script src='config.js'></script>
+        <script src='guario.js'></script>
+        <script src='control.js'></script>
+    </body>
+</html>
