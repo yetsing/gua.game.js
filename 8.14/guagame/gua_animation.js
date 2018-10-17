@@ -1,26 +1,26 @@
 class GuaAnimation {
-    constructor(game, name) {
+    constructor(game) {
         this.game = game
-        this.img = GuaImage.new(game, name)
+        // this.img = GuaImage.new(game, name)
+        this.x = 0
+        this.y = 0
         this.interval = 3
         this.frameCount = this.interval
         this.frameIndex = 0
     }
-    static new(game, name) {
-        return new this(game, name)
+    static new(game) {
+        return new this(game)
     }
     init(config) {
         this.frameX = config.frameX[0]
         this.frameY = config.frameY[0]
         this.frameWidth = config.frameWidth
         this.frameHeight = config.frameHeight
-        this.x = config.x
-        this.y = config.y
         this.config = config
     }
     update() {
         this.frameCount--
-        if (this.frameCount == 0) {
+        if (this.frameCount <= 0) {
             this.frameCount = this.interval
             this.frameIndex++
             this.frameIndex %= this.config.frameX.length

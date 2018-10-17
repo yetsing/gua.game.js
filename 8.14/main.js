@@ -13,6 +13,7 @@ const ajax = request => {
 var __main = function() {
     var images = {
         mario_move: 'img/mario-move.png',
+        mario_idle: 'img/mario-idle.png',
         brick: 'img/brick.png',
         groud: 'img/groud.png',
         question_mark: 'img/question-mark.png',

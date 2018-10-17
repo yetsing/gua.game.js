@@ -15,7 +15,11 @@ const config = {
         frameY: [0, 0, 0],
         frameWidth: 48,
         frameHeight: 96,
-        x: 200,
-        y: 385,
     },
+    mario_idle: {
+        frameX: [0],
+        frameY: [0],
+        frameWidth: 48,
+        frameHeight: 96,
+    }
 }
