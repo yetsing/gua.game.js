@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>guario</title>
+        <style media="screen">
+            div {
+                outline: dashed lightskyblue;
+            }
+            canvas {
+                border: 1px black solid;
+            }
+            .gua-inline-block {
+                display: inline-block;
+            }
+        </style>
+    </head>
+    <body>
+        <h3>#5080FF</h3>
+        <canvas id="id-canvas"
+            data-action="draw_tile"
+            width="512" height="480">
+        </canvas>
+        <div class="gua-inline-block">
+            <img data-action="change_active_tile" src="img/brick.png" data-name="brick">
+            <img data-action="change_active_tile" src="img/groud.png" data-name="groud">
+            <img data-action="change_active_tile" src="img/grass.png" data-name="grass">
+            <img data-action="change_active_tile" src="img/question-mark.png" data-name="question_mark">
+        </div>
+<script type="text/javascript">
+var e = sel => document.querySelector(sel)
+
+var log = console.log.bind(console)
+
+const tilePosition = (x, y) => {
+    let i = Math.floor(x / window.tileSize)
+    let j = Math.floor(y / window.tileSize)
+    let x1 = i * window.tileSize
+    let y1 = j * window.tileSize
+    return [x1, y1]
+}
+
+const drawTileAt = (x, y) => {
+    let [x1, y1] = tilePosition(x, y)
+    window.context.fillRect(x1, y1, window.tileSize, window.tileSize)
+    window.context.drawImage(window.activeTile, x1, y1)
+    let tile = window.activeTile.dataset.name
+    let mx = x1 / window.tileSize
+    let my = y1 / window.tileSize
+    window.map.setTile(mx, my, tile)
+}
+
+const actions = {
+    change_active_tile(event) {
+        let name = event.target.dataset.name
+        log(name)
+        window.activeTile = event.target
+    },
+    draw_tile(event) {
+        let target = event.target
+        let rect = target.getBoundingClientRect()
+        let x = event.clientX - rect.left
+        let y = event.clientY - rect.top
+        let [x1, y1] = tilePosition(x, y)
+        window.context.fillRect(x1, y1, window.tileSize, window.tileSize)
+        window.context.drawImage(window.activeTile, x1, y1)
+    },
+}
+
+const bindActions = () => {
+    e('body').addEventListener('click', event => {
+        let action = event.target.dataset.action
+        actions[action] & actions[action](event)
+    })
+    // 拖动事件
+    let moving = false
+    window.canvas.addEventListener('mousedown', event => {
+        moving = true
+        let target = event.target
+        let rect = target.getBoundingClientRect()
+        let x = event.clientX - rect.left
+        let y = event.clientY - rect.top
+        drawTileAt(x, y)
+    })
+    window.canvas.addEventListener('mousemove', event => {
+        if (moving) {
+            let target = event.target
+            let rect = target.getBoundingClientRect()
+            let x = event.clientX - rect.left
+            let y = event.clientY - rect.top
+            drawTileAt(x, y)
+        }
+    })
+    window.canvas.addEventListener('mouseup', event => {
+        moving = false
+    })
+}
+
+const init = () => {
+    window.map = Map.new()
+    window.window.tileSize = 48
+    window.activeTile = null
+    window.canvas = e('canvas')
+    window.context = window.canvas.getContext('2d')
+    window.context.fillStyle = '#5080FF'
+    window.context.fillRect(0, 0, 512, 480)
+}
+
+class Map {
+    constructor() {
+        this.width = 20
+        this.height = 15
+        this.tiles = []
+        this.setupTiles()
+    }
+    static new() {
+        return new this()
+    }
+    setupTiles() {
+        let s = this.width * this.height
+        for (var i = 0; i < s; i++) {
+            this.tiles[i] = 0
+        }
+    }
+    setTile(i, j, tile) {
+        let index = i * this.height + j
+        this.tiles[index] = tile
+    }
+}
+
+const __main = () => {
+    init()
+    bindActions()
+}
+
+__main()
+</script>
+    </body>
+</html>
