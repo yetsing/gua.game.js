@@ -54,6 +54,7 @@ const drawSprite = (data, canvas, offsetX, offsetY, w, h, pixelWidth) => {
         for (var j = 0; j < h; j++) {
             let x = (offsetX + j) * blockSize
             let y = (offsetY + i) * blockSize
+            window.drawPosition = [x, y]
             let pixels = data.slice(offset)
             drawBlock(context, pixels, x, y, pw)
             offset += 16
@@ -119,6 +120,14 @@ const actions = {
         let checkbox = event.target
         log('checkbox', checkbox.checked, checkbox.name)
         window[checkbox.name] = checkbox.checked
+    },
+    clear_block(event) {
+        let [x, y] = window.drawPosition
+        log('cancel draw', x, y)
+        let canvas = e('#id-canvas-tile')
+        let context = canvas.getContext('2d')
+        let blockSize = 16
+        context.clearRect(x, y, blockSize, blockSize)
     },
 }
 
