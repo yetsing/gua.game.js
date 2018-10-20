@@ -25,9 +25,9 @@ const drawBlock = (context, data, x, y, pixelWidth) => {
             let c1 = (p1 >> (7 - j)) & 0b00000001
             let c2 = (p2 >> (7 - j)) & 0b00000001
             let pixel = (c2 << 1) + c1
-            // if (pixel == 0) {
-            //     continue
-            // }
+            if (pixel == 0) {
+                continue
+            }
             let color = colors[pixel]
             context.fillStyle = color
             var px = x + j * w
@@ -98,7 +98,7 @@ const actions = {
         let y = event.clientY - rect.top
         let pixelWidthConfig = {
             source: 10,
-            tile: 3,
+            tile: 2,
         }
         let i = Math.floor(x / 8 / pixelWidthConfig[type])
         let j = Math.floor(y / 8 / pixelWidthConfig[type])
@@ -108,7 +108,7 @@ const actions = {
             window.tileOffset = window.offset + offset
         } else if (type == 'tile') {
             let data = window.bytes.slice(window.tileOffset)
-            drawSprite(data, target, i, j, 1, 1, 3)
+            drawSprite(data, target, i, j, 1, 1, 2)
         }
     },
     clear_canvas(event) {
@@ -125,10 +125,8 @@ const actions = {
 const bindEvents = () => {
     e('body').addEventListener('click', event => {
         let action = event.target.dataset.action
-        log('action', action)
         actions[action] & actions[action](event)
     })
-    log(e('select'))
     e('select').addEventListener('input', event => {
         let thing = event.target.value
         log('thing', thing)

@@ -1,11 +1,11 @@
 const control = {
     width: {
         _comment: '拼图版宽度',
-        value: 96,
+        value: 64,
     },
     height: {
         _comment: '拼图版高度',
-        value: 96,
+        value: 64,
     },
 }
 
@@ -22,7 +22,7 @@ var insertDebugBox = function() {
             <label>
                 <input class="gua-auto-slider" type="range"
                 max="1000"
-                step="24"
+                step="16"
                 value="${control[s].value}"
                 data-value="control.${s}"
                 >
@@ -70,9 +70,24 @@ var bindChangeEvents = function() {
     })
 }
 
+var addColorOptions = function() {
+    var names = Object.keys(config.color)
+    var colorSelect = e('select')
+    for (var i = 0; i < names.length; i++) {
+        var key = names[i]
+        if (key == 'mario') {
+            var t = `<option value="mario" selected="selected">mario</option>`
+        } else {
+            var t = `<option value="${key}">${key}</option>`
+        }
+        colorSelect.insertAdjacentHTML('afterbegin', t)
+    }
+}
+
 var enableDebugMode = function(game) {
     insertDebugBox()
     bindChangeEvents()
+    addColorOptions()
     // updateCanvasSize()
 }
 
