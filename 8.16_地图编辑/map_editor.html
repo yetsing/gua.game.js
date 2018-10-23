@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>guario</title>
+        <style media="screen">
+            div {
+                outline: dashed lightskyblue;
+            }
+            canvas {
+                border: 1px black solid;
+            }
+            .gua-inline-block {
+                display: inline-block;
+            }
+        </style>
+    </head>
+    <body>
+        <strong>填充放置位置不在节点上的图片</strong>
+        <h3></h3>
+        <div style="width:531px; height:483px; overflow:auto">
+            <canvas id="id-canvas"
+                data-action="draw_tile"
+                width="6752" height="480">
+            </canvas>
+        </div>
+        <button data-action="switch_tile_size">switch tile size</button>
+        <button data-action="clear_sprite">clear sprite</button>
+        <button data-action="cancel">cancel</button>
+        <button data-action="save">save</button>
+        <div class="gua-inline-block">
+            <img data-action="change_active_tile" src="img/brick.png" data-id="1">
+            <img data-action="change_active_tile" src="img/groud.png" data-id="2">
+            <img data-action="change_active_tile" src="img/question-mark.png" data-id="3">
+            <img data-action="change_active_tile" src="img/cloud1.png" data-id="4">
+            <img data-action="change_active_tile" src="img/cloud2.png" data-id="5">
+            <img data-action="change_active_tile" src="img/cloud3.png" data-id="6">
+            <img data-action="change_active_tile" src="img/grass1.png" data-id="7">
+            <img data-action="change_active_tile" src="img/grass2.png" data-id="8">
+            <img data-action="change_active_tile" src="img/grass3.png" data-id="9">
+            <img data-action="change_active_tile" src="img/mount1.png" data-id="10">
+            <img data-action="change_active_tile" src="img/mount2.png" data-id="11">
+            <img data-action="change_active_tile" src="img/pipe1.png" data-id="12">
+            <img data-action="change_active_tile" src="img/pipe2.png" data-id="13">
+            <img data-action="change_active_tile" src="img/pipe3.png" data-id="14">
+            <img data-action="change_active_tile" src="img/castle.png" data-id="15">
+            <img data-action="change_active_tile" src="img/flagpole.png" data-id="16">
+            <img data-action="change_active_tile" src="img/square.png" data-id="17">
+        </div>
+<script type="text/javascript">
+var e = sel => document.querySelector(sel)
+
+var log = console.log.bind(console)
+
+const ajax = request => {
+    let r = new XMLHttpRequest()
+    log('before open')
+    r.open('POST', request.url, true)
+    log('after open')
+    r.responseType = 'arraybuffer'
+    r.onreadystatechange = event => {
+        if (r.readyState == 4) {
+            request.callback(r.response)
+        }
+    }
+    r.send(request.data)
+}
+
+const tilePosition = (x, y) => {
+    let i = Math.floor(x / window.tileSize)
+    let j = Math.floor(y / window.tileSize)
+    let x1 = i * window.tileSize
+    let y1 = j * window.tileSize
+    return [x1, y1]
+}
+
+const drawTileAt = (x, y) => {
+    let [x1, y1] = tilePosition(x, y)
+    // 记录最近一次 tile 的位置和大小
+    let info = [x1, y1, window.activeTile.width, window.activeTile.height]
+    window.drawHistory.push(info)
+    window.context.fillRect(x1, y1, window.activeTile.width, window.activeTile.height)
+    let tile = Number(window.activeTile.dataset.id)
+    let mx = x1 / window.tileSize
+    let my = y1 / window.tileSize
+    log('tile position', mx, my)
+    if (!window.clearSprite) {
+        window.context.drawImage(window.activeTile, x1, y1)
+        window.map.setTile(mx, my, tile)
+    } else {
+        window.map.setTile(mx, my, 0)
+    }
+}
+
+const actions = {
+    change_active_tile(event) {
+        let id = Number(event.target.dataset.id)
+        log(id)
+        window.activeTile = event.target
+    },
+    // draw_tile(event) {
+    //     let target = event.target
+    //     let rect = target.getBoundingClientRect()
+    //     let x = event.clientX - rect.left
+    //     let y = event.clientY - rect.top
+    //     let [x1, y1] = tilePosition(x, y)
+    //     window.context.fillRect(x1, y1, window.tileSize, window.tileSize)
+    //     if (!window.clearSprite) {
+    //         window.context.drawImage(window.activeTile, x1, y1)
+    //     }
+    // },
+    save(event) {
+        log('save')
+        let data = JSON.stringify(window.map.tiles)
+        let request = {
+            url: '/save',
+            data: data,
+            callback(r) {
+                log('success')
+            },
+        }
+        ajax(request)
+    },
+    clear_sprite(event) {
+        window.clearSprite = !window.clearSprite
+        let button = event.target
+        if (window.clearSprite) {
+            button.innerText = 'cancel clear'
+        } else {
+            button.innerText = 'clear sprite'
+        }
+    },
+    switch_tile_size(event) {
+        var h = e('h3')
+        if (window.tileSize == 32) {
+            window.tileSize = 16
+            h.innerText = 'tile size 16'
+        } else {
+            window.tileSize = 32
+            h.innerText = 'tile size 32'
+        }
+    },
+    // 可以撤销所有的操作（没有区分重复的操作）
+    cancel(event) {
+        let [x, y, w, h] = window.drawHistory.pop()
+        window.context.fillRect(x, y, w, h)
+        let mx = x / window.tileSize
+        let my = y / window.tileSize
+        window.map.setTile(mx, my, 0)
+    }
+}
+
+const bindActions = () => {
+    e('body').addEventListener('click', event => {
+        let action = event.target.dataset.action
+        actions[action] && actions[action](event)
+    })
+    // 拖动事件
+    let moving = false
+    window.canvas.addEventListener('mousedown', event => {
+        moving = true
+        let target = event.target
+        let rect = target.getBoundingClientRect()
+        let x = event.clientX - rect.left
+        let y = event.clientY - rect.top
+        drawTileAt(x, y)
+    })
+    window.canvas.addEventListener('mousemove', event => {
+        if (moving) {
+            let target = event.target
+            let rect = target.getBoundingClientRect()
+            let x = event.clientX - rect.left
+            let y = event.clientY - rect.top
+            drawTileAt(x, y)
+        }
+    })
+    window.canvas.addEventListener('mouseup', event => {
+        moving = false
+    })
+}
+
+const init = () => {
+    window.map = Map.new()
+    window.tileSize = 32
+    window.activeTile = null
+    window.clearSprite = false
+    window.drawHistory = []
+    window.canvas = e('canvas')
+    window.context = window.canvas.getContext('2d')
+    window.context.fillStyle = '#5080FF'
+    window.context.fillRect(0, 0, 6880, 480)
+}
+
+class Map {
+    constructor() {
+        this.width = 211
+        this.height = 15
+        this.tiles = []
+        this.setupTiles()
+    }
+    static new() {
+        return new this()
+    }
+    setupTiles() {
+        let s = this.width * this.height
+        for (var i = 0; i < s; i++) {
+            this.tiles[i] = 0
+        }
+    }
+    setTile(i, j, tile) {
+        let index = i * this.height + j
+        this.tiles[index] = tile
+    }
+}
+
+const __main = () => {
+    init()
+    bindActions()
+}
+
+__main()
+</script>
+    </body>
+</html>

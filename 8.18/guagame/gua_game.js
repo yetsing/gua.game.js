@@ -13,6 +13,7 @@ class GuaGame {
         this.keydowns = {}
         this.canvas = document.querySelector('#id-canvas')
         this.context = this.canvas.getContext('2d')
+        this.context.fillStyle = '#5080FF'
         // events
         var self = this
         window.addEventListener('keydown', event => {
@@ -65,7 +66,8 @@ class GuaGame {
         // update
         g.update()
         // clear
-        g.context.clearRect(0, 0, g.canvas.width, g.canvas.height)
+        // g.context.clearRect(0, 0, g.canvas.width, g.canvas.height)
+        g.context.fillRect(0, 0, g.canvas.width, g.canvas.height)
         // draw
         g.draw()
         // next run loop

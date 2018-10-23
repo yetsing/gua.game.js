@@ -17,10 +17,20 @@ var __main = function() {
         brick: 'img/brick.png',
         groud: 'img/groud.png',
         question_mark: 'img/question-mark.png',
-        grass: 'img/grass.png',
         cloud1: 'img/cloud1.png',
         cloud2: 'img/cloud2.png',
-
+        cloud3: 'img/cloud3.png',
+        grass1: 'img/grass1.png',
+        grass2: 'img/grass2.png',
+        grass3: 'img/grass3.png',
+        mount1: 'img/mount1.png',
+        mount2: 'img/mount2.png',
+        pipe1: 'img/pipe1.png',
+        pipe2: 'img/pipe2.png',
+        pipe3: 'img/pipe3.png',
+        castle: 'img/castle.png',
+        flagpole: 'img/flagpole.png',
+        square: 'img/square.png',
     }
     // let requset = {
     //     url: 'mario.nes',

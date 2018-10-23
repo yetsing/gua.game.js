@@ -7,6 +7,12 @@ const control = {
         _comment: 'mario_y',
         value: 436,
     },
+    map_speed: {
+        _comment: '地图移动速度',
+        value: 4,
+        step: 2,
+        max: 64,
+    }
 }
 
 const config = {

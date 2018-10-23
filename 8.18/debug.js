@@ -26,11 +26,14 @@ var insertDebugBox = function() {
     // log(setting)
     for (var i = 0; i < items.length; i++) {
         var s = items[i]
+        var max = control[s].max || control[s].value
+        var step = control[s].step || 1
         var t = `
         <div>
             <label>
                 <input class="gua-auto-slider" type="range"
-                max="${control[s].value}"
+                max="${max}"
+                step="${step}"
                 value="${control[s].value}"
                 data-value="control.${s}"
                 >
