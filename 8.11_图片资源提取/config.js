@@ -13,6 +13,6 @@ const config = {
         flagpole: ['#FFFFFF', '#98E800', '#48A810', '#000000'],
         flag1: ['#FFFFFF', '#48A810', '#FFFFFF', '#000000'],
         flag2: ['#FFFFFF', '#E05000', '#FFFFFF', '#FFA000'],
-        castle: ['#FFFFFF', '#FFFFFF', '#C07000', '#000000'],
+        castle: ['#FFFFFF', '#FFC8B8', '#C07000', '#000000'],
     },
 }

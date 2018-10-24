@@ -16,7 +16,7 @@
         </style>
     </head>
     <body>
-        <strong>填充放置位置不在节点上的图片</strong>
+        <strong>地图统一用 32 * 32 的格子铺</strong>
         <h3></h3>
         <div style="width:531px; height:483px; overflow:auto">
             <canvas id="id-canvas"
@@ -32,22 +32,35 @@
             <img data-action="change_active_tile" src="/static?file=brick.png" data-id="1">
             <img data-action="change_active_tile" src="/static?file=groud.png" data-id="2">
             <img data-action="change_active_tile" src="/static?file=question-mark.png" data-id="3">
-            <img data-action="change_active_tile" src="/static?file=cloud1.png" data-id="4">
-            <img data-action="change_active_tile" src="/static?file=cloud2.png" data-id="5">
-            <img data-action="change_active_tile" src="/static?file=cloud3.png" data-id="6">
-            <img data-action="change_active_tile" src="/static?file=grass1.png" data-id="7">
-            <img data-action="change_active_tile" src="/static?file=grass2.png" data-id="8">
-            <img data-action="change_active_tile" src="/static?file=grass3.png" data-id="9">
-            <img data-action="change_active_tile" src="/static?file=mount1.png" data-id="10">
-            <img data-action="change_active_tile" src="/static?file=mount2.png" data-id="11">
-            <img data-action="change_active_tile" src="/static?file=pipe1.png" data-id="12">
-            <img data-action="change_active_tile" src="/static?file=pipe2.png" data-id="13">
-            <img data-action="change_active_tile" src="/static?file=pipe3.png" data-id="14">
-            <img data-action="change_active_tile" src="/static?file=castle.png" data-id="15">
-            <img data-action="change_active_tile" src="/static?file=flagpole.png" data-id="16">
-            <img data-action="change_active_tile" src="/static?file=square.png" data-id="17">
+            <img data-action="change_active_tile" src="/static?file=square.png" data-id="4">
+            <img data-action="change_active_tile" src="/static?file=cloud1.png" data-id="5">
+            <img data-action="change_active_tile" src="/static?file=cloud2.png" data-id="6">
+            <img data-action="change_active_tile" src="/static?file=cloud3.png" data-id="7">
+            <img data-action="change_active_tile" src="/static?file=cloud4.png" data-id="8">
+            <img data-action="change_active_tile" src="/static?file=grass1.png" data-id="9">
+            <img data-action="change_active_tile" src="/static?file=grass2.png" data-id="10">
+            <img data-action="change_active_tile" src="/static?file=grass3.png" data-id="11">
+            <img data-action="change_active_tile" src="/static?file=mount1.png" data-id="12">
+            <img data-action="change_active_tile" src="/static?file=mount2.png" data-id="13">
+            <img data-action="change_active_tile" src="/static?file=mount3.png" data-id="14">
+            <img data-action="change_active_tile" src="/static?file=mount4.png" data-id="15">
+            <img data-action="change_active_tile" src="/static?file=mount5.png" data-id="16">
+            <img data-action="change_active_tile" src="/static?file=mount6.png" data-id="17">
+            <img data-action="change_active_tile" src="/static?file=pipe1.png" data-id="18">
+            <img data-action="change_active_tile" src="/static?file=pipe2.png" data-id="19">
+            <img data-action="change_active_tile" src="/static?file=pipe3.png" data-id="20">
+            <img data-action="change_active_tile" src="/static?file=pipe4.png" data-id="21">
+            <img data-action="change_active_tile" src="/static?file=castle1.png" data-id="22">
+            <img data-action="change_active_tile" src="/static?file=castle2.png" data-id="23">
+            <img data-action="change_active_tile" src="/static?file=castle3.png" data-id="24">
+            <img data-action="change_active_tile" src="/static?file=castle4.png" data-id="25">
+            <img data-action="change_active_tile" src="/static?file=castle5.png" data-id="26">
+            <img data-action="change_active_tile" src="/static?file=castle6.png" data-id="27">
+            <img data-action="change_active_tile" src="/static?file=castle7.png" data-id="28">
+            <img data-action="change_active_tile" src="/static?file=flagpole1.png" data-id="29">
+            <img data-action="change_active_tile" src="/static?file=flagpole2.png" data-id="30">
         </div>
-        <script src='/static?file=gua_map_data.js'></script>
+        <script src="/static?file=gua_map_data.js"></script>
 <script type="text/javascript">
 var e = sel => document.querySelector(sel)
 
@@ -78,9 +91,8 @@ const tilePosition = (x, y) => {
 const drawTileAt = (x, y) => {
     let [x1, y1] = tilePosition(x, y)
     // 记录最近一次 tile 的位置和大小
-    let info = [x1, y1, window.activeTile.width, window.activeTile.height]
-    window.drawHistory.push(info)
-    window.context.fillRect(x1, y1, window.activeTile.width, window.activeTile.height)
+    let pos = [x1, y1]
+    window.drawHistory.push(pos)
     let tile = Number(window.activeTile.dataset.id)
     let mx = x1 / window.tileSize
     let my = y1 / window.tileSize
@@ -89,6 +101,7 @@ const drawTileAt = (x, y) => {
         window.context.drawImage(window.activeTile, x1, y1)
         window.map.setTile(mx, my, tile)
     } else {
+        window.context.fillRect(x1, y1, window.tileSize, window.tileSize)
         window.map.setTile(mx, my, 0)
     }
 }
@@ -143,8 +156,8 @@ const actions = {
     },
     // 可以撤销所有的操作（没有区分重复的操作）
     cancel(event) {
-        let [x, y, w, h] = window.drawHistory.pop()
-        window.context.fillRect(x, y, w, h)
+        let [x, y] = window.drawHistory.pop()
+        window.context.fillRect(x, y, window.tileSize, window.tileSize)
         let mx = x / window.tileSize
         let my = y / window.tileSize
         window.map.setTile(mx, my, 0)
