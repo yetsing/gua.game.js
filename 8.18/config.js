@@ -15,14 +15,26 @@ const control = {
     }
 }
 
-const config = {
-    mario_move: {
+const marioConfig = {
+    move: {
         frameX: [0, 32, 64],
         frameY: [0, 0, 0],
         frameWidth: 32,
         frameHeight: 64,
     },
-    mario_idle: {
+    idle: {
+        frameX: [0],
+        frameY: [0],
+        frameWidth: 32,
+        frameHeight: 64,
+    },
+    jump: {
+        frameX: [0],
+        frameY: [0],
+        frameWidth: 32,
+        frameHeight: 64,
+    },
+    turn: {
         frameX: [0],
         frameY: [0],
         frameWidth: 32,

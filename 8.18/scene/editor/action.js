@@ -8,7 +8,7 @@ const actions = {
 const bindActions = () => {
     e('body').addEventListener('click', event => {
         let action = event.target.dataset.action
-        actions[action] & actions[action](event)
+        actions[action] && actions[action](event)
     })
 }
 

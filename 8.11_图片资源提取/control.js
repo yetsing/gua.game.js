@@ -1,11 +1,11 @@
 const control = {
     width: {
         _comment: '拼图版宽度',
-        value: 64,
+        value: 32,
     },
     height: {
         _comment: '拼图版高度',
-        value: 64,
+        value: 32,
     },
 }
 

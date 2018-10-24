@@ -14,8 +14,10 @@ var __main = function() {
     var images = {
         mario_move: 'img/mario-move.png',
         mario_idle: 'img/mario-idle.png',
+        mario_jump: 'img/mario-jump.png',
+        mario_turn: 'img/mario-turn.png',
         brick: 'img/brick.png',
-        groud: 'img/groud.png',
+        ground: 'img/ground.png',
         question_mark: 'img/question-mark.png',
         cloud1: 'img/cloud1.png',
         cloud2: 'img/cloud2.png',

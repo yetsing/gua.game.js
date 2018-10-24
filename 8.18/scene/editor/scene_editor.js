@@ -20,7 +20,7 @@ class SceneEditor extends GuaScene {
         g.registerAction('d', function(keyStatus){
             m.moveRight(keyStatus)
         })
-        g.registerAction('w', function(keyStatus){
+        g.registerAction('j', function(keyStatus){
             m.jump(keyStatus)
         })
     }
