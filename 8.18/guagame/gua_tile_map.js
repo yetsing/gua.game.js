@@ -47,12 +47,18 @@ class GuaTileMap {
     static new(game) {
         return new this(game)
     }
-    onTheGround(i, j) {
+    // hitObstacle(i, j) {
+    //     let index = i * this.th + j
+    //     let tile = this.tiles[index]
+    //     let obstacle = [1, 2, 3, 4, 18, 19]
+    //     // log('on the ground', tile, tile in ground)
+    //     return obstacle.includes(tile)
+    // }
+    hitObstacle(i, j) {
         let index = i * this.th + j
         let tile = this.tiles[index]
-        let ground = [1, 2, 3, 12, 13, 14, 17]
-        // log('on the ground', tile, tile in ground)
-        return ground.includes(tile)
+        let obstacle = [1, 2, 3, 4, 18, 19, 20, 21]
+        return obstacle.includes(tile) && j >= 0
     }
     update() {
         // log('map move speed', this.speed)

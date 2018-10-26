@@ -11,7 +11,8 @@ class Mario extends GuaAnimation {
         this.interval = 6
         this.speed = 5
         this.vy = 0
-        this.gy = 2
+        this.ay = 9
+        this.gy = 3.5
         // 加速和摩擦
         this.vx = 0
         this.ax = 0
@@ -22,9 +23,12 @@ class Mario extends GuaAnimation {
         //     'jump': 0.3,
         // }
         // 最大速度
-        this.maxSpeed = 10
-        this.jumpCount = 20
+        this.maxSpeed = 8
+        // this.jumpCount = 75
+        this.keyUp = true
         this.canJump = true
+        this.jumpMove = true
+        this.jumpCount = 9
         this.status = 'idle'
         this.imagesPerStatus = {
             idle: GuaImage.new(this.game, 'mario_idle'),
@@ -34,16 +38,73 @@ class Mario extends GuaAnimation {
         }
         this.img = this.imagesPerStatus[this.status]
         this.tileSize = this.map.tileSize
+        this.hitStatus = 'move'
+        this.hit = false
     }
     onTheGround() {
-        let offset = -this.map.offsetX
         // 左下角
-        let i1 = Math.floor((this.x + offset) / this.tileSize)
+        let i1 = Math.floor((this.x + this.offsetX + 2) / this.tileSize)
         // 右下角
-        let i2 = Math.floor((this.x + offset) / this.tileSize) + 1
+        let i2 = Math.floor((this.x + this.offsetX - 2) / this.tileSize) + 1
         let j = Math.floor(this.y / this.tileSize) + 2
-        let result = this.map.onTheGround(i1, j) || this.map.onTheGround(i2, j)
+        let result = this.map.hitObstacle(i1, j) || this.map.hitObstacle(i2, j)
         return result
+    }
+    //  跳起碰到砖块
+    hitWithHead() {
+        // 左上角
+        let i1 = Math.floor((this.x + this.offsetX + 2) / this.tileSize)
+        // 右上角
+        let i2 = Math.floor((this.x + this.offsetX - 2) / this.tileSize) + 1
+        let j = Math.floor(this.y / this.tileSize)
+        let result = this.map.hitObstacle(i1, j) || this.map.hitObstacle(i2, j)
+        return result
+    }
+    // 向左走碰撞
+    hitLeft() {
+        var i = Math.floor((this.x + this.offsetX) / this.tileSize)
+        let j1 = Math.floor(this.y / this.tileSize)
+        let j2 = Math.floor(this.y / this.tileSize) + 1
+        let j3 = Math.floor((this.y - 2) / this.tileSize) + 2
+        let result = this.map.hitObstacle(i, j1) || this.map.hitObstacle(i, j2) || this.map.hitObstacle(i, j3)
+        // if (result) {
+        //     this.x = i * this.tileSize - this.offsetX
+        // }
+        return result
+    }
+    // 向右走碰撞
+    hitRight() {
+        let i = Math.floor((this.x + this.offsetX) / this.tileSize) + 1
+        let j1 = Math.floor(this.y / this.tileSize)
+        let j2 = Math.floor(this.y / this.tileSize) + 1
+        let j3 = Math.floor((this.y - 2) / this.tileSize) + 2
+        let result = this.map.hitObstacle(i, j1) || this.map.hitObstacle(i, j2) || this.map.hitObstacle(i, j3)
+        if (result) {
+            this.x = (i - 1) * this.tileSize - this.offsetX
+        }
+        return result
+    }
+    updateGravity() {
+        let onTheGround = this.onTheGround()
+        if (onTheGround && this.vy >= 0) {
+            this.vy = 0
+            this.y = Math.floor(this.y / this.tileSize) * this.tileSize
+            this.canJump = this.keyUp
+            this.jumpMove = true
+            this.hit = this.hitStatus == 'jump'
+        } else if (this.hitWithHead()) {
+            log('hit head')
+            this.vy = 5
+            this.hit = this.hitStatus == 'jump'
+            // let y = Math.floor(this.y / this.tileSize) * this.tileSize
+            // this.y = Math.min(this.y, y)
+        } else {
+            this.vy += this.gy
+            this.vy = Math.min(this.vy, 20)
+            // if (this.onTheGround) {
+            //     this.y = (j - 2) * this.tileSize
+            // }
+        }
     }
     //  更新水平方向受力
     updateAtHorizontal() {
@@ -57,18 +118,14 @@ class Mario extends GuaAnimation {
             this.vx = 0
             this.mx = 0
         }
-    }
-    updateGravity() {
-        let onTheGround = this.onTheGround()
-        if (onTheGround && this.vy > 0) {
-            this.vy = 0
-            this.y = Math.floor(this.y / this.tileSize) * this.tileSize
-            this.canJump = true
-        } else {
-            this.vy += this.gy * 0.2
-            // if (this.onTheGround) {
-            //     this.y = (j - 2) * this.tileSize
-            // }
+        if (this.hit) {
+            return
+        }
+        if (this.hitLeft() && this.vx < 0) {
+            this.vx = 0
+            // this.x = Math.floor(this.x / this.tileSize) * this.tileSize
+        } else if (this.hitRight() && this.vx > 0) {
+            this.vx = 0
         }
     }
     // 更新摩擦力
@@ -81,10 +138,10 @@ class Mario extends GuaAnimation {
         } else {
             factor = 0
         }
-        this.mx = 0.2 * factor
+        this.mx = 0.3 * factor
         let onTheGround = this.onTheGround()
         if (this.ax == 0 && onTheGround) {
-            this.mx = 0.9 * factor
+            this.mx = 0.7 * factor
         }
     }
     updatePosition() {
@@ -92,39 +149,52 @@ class Mario extends GuaAnimation {
         if (this.x <= 0) {
             this.x = 0
             this.vx = 0.5 * this.vx
+            // this.map.speed = Math.min(this.vx, 0)
         } else if (this.x >= 198) {
             this.x = 198
             this.map.speed = Math.max(this.vx, 0)
+        } else {
+            this.map.speed = 0
         }
         this.y += this.vy
     }
     updateStatus() {
         let onTheGround = this.onTheGround()
         if (onTheGround) {
-            if (this.vx == 0) {
+            if (this.vx == 0 && this.ax == 0) {
                 this.changeStatus('idle')
-            } else if (this.vx * this.ax > 1.4) {
-                this.changeStatus('move')
             } else if (this.vx * this.ax < -1.4) {
                 this.changeStatus('turn')
+            } else {
+                this.changeStatus('move')
             }
+            this.hitStatus = 'move'
         } else {
             this.changeStatus('jump')
+            this.hitStatus = 'jump'
+            // this.canJump = false
         }
+    }
+    updateControl() {
+        this.gy = control.gy.value
+        this.jumpSpeed = control.jump_speed.value
     }
     update() {
         super.update()
+        this.updateControl()
         // this.x = control.x.value
         // this.y = control.y.value
         // if (this.game.paused) {
         //     return
         // }
+        this.offsetX = -this.map.offsetX
         this.interval = 6 - 0.4 * Math.abs(this.vx)
+        this.updateGravity()
         this.updateAtHorizontal()
         this.updateRub()
-        this.updateGravity()
         this.updatePosition()
         this.updateStatus()
+        this.his = false
     }
     draw() {
         var context = this.game.context
@@ -145,26 +215,28 @@ class Mario extends GuaAnimation {
         )
         context.restore()
     }
+    move(a, s) {
+        if (this.status == 'jump') {
+            if (this.jumpMove) {
+                log('jumpMove')
+                this.vx = this.vx || s
+                this.jumpMove = false
+            }
+        } else {
+            this.flipX = a < 0
+            this.ax = a
+        }
+    }
     moveLeft(keyStatus) {
         if (keyStatus == 'down') {
-            if (this.status == 'jump') {
-                this.vx = this.vx || -5
-            } else {
-                this.flipX = true
-                this.ax = -0.7
-            }
+            this.move(-0.6, -4)
         } else {
             this.ax = 0
         }
     }
     moveRight(keyStatus) {
         if (keyStatus == 'down') {
-            if (this.status == 'jump') {
-                this.vx = this.vx || 5
-            } else {
-                this.flipX = false
-                this.ax = 0.7
-            }
+            this.move(0.6, 4)
         } else {
             this.ax = 0
         }
@@ -172,16 +244,19 @@ class Mario extends GuaAnimation {
     jump(keyStatus) {
         // this.changeStatus('jump')
         if (keyStatus == 'down') {
-            if (this.jumpCount == 0) {
-                this.canJump = false
-            }
-            if (this.canJump) {
-                this.y -= 12
-                this.jumpCount--
-            }
+            this.vy -= this.ay
+            this.ay--
+            this.jumpMove = this.vx == 0
+            // this.keyUp = false
+            // if (this.canJump) {
+            //     this.vy -= this.ay
+            //     this.ay--
+            //     this.jumpMove = this.vx == 0
+            // }
         } else {
-            this.canJump = false
-            this.jumpCount = 15
+            this.ay = 9
+            this.keyUp = true
+            // this.jumpCount = 9
         }
     }
     limitPosition() {
