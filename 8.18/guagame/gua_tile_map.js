@@ -41,24 +41,40 @@ class GuaTileMap {
             GuaImage.new(game, 'flagpole1'),
             GuaImage.new(game, 'flagpole2'),
         ]
+        this.hitImages = {}
+        this.hitPosition = {}
         this.speed = 0
         this.correctCount = 0
     }
     static new(game) {
         return new this(game)
     }
-    // hitObstacle(i, j) {
-    //     let index = i * this.th + j
-    //     let tile = this.tiles[index]
-    //     let obstacle = [1, 2, 3, 4, 18, 19]
-    //     // log('on the ground', tile, tile in ground)
-    //     return obstacle.includes(tile)
-    // }
-    hitObstacle(i, j) {
+    collisionFromDown(i, j) {
         let index = i * this.th + j
-        let tile = this.tiles[index]
+        let tileNumber = this.tiles[index]
         let obstacle = [1, 2, 3, 4, 18, 19, 20, 21]
-        return obstacle.includes(tile) && j >= 0
+        let hitted = obstacle.includes(tileNumber) && j >= 0
+        // 记录撞击
+        if (hitted && tileNumber == 1) {
+            this.hitPosition[index] = true
+        }
+        return hitted
+    }
+    collision(i, j) {
+        let index = i * this.th + j
+        var tileNumber = this.tiles[index]
+        let obstacle = [1, 2, 3, 4, 18, 19, 20, 21]
+        return obstacle.includes(tileNumber) && j >= 0
+    }
+    getHitImage(key, y) {
+        if (this.hitImages[key]) {
+            return this.hitImages[key]
+        } else {
+            let b = Brick.new(this.game)
+            this.hitImages[key] = b
+            b.y = y
+            return b
+        }
     }
     update() {
         // log('map move speed', this.speed)
@@ -79,24 +95,30 @@ class GuaTileMap {
                 this.correctCount = 0
             }
             this.start = Math.min(this.start, 2745)
-            // log('start', this.start, this.offsetX)
         }
-        // if (this.start > 2745) {
-        //     this.start = 2745
-        // }
     }
     draw() {
         let s = this.start + this.th * this.tw * 2
-        // log('draw part', this.start, s)
         for (var i = this.start; i < s; i++) {
             let index = this.tiles[i]
             if (index != 0) {
-                let x = Math.floor(i / this.th) * this.tileSize
-                x += this.offsetX
-                let y = (i % this.th) * this.tileSize
                 let image = this.tileImages[index - 1]
-                this.game.context.drawImage(image.texture, x, y)
-                // log('draw tile')
+                let x = Math.floor(i / this.th) * this.tileSize + this.offsetX
+                let y = (i % this.th) * this.tileSize
+                if (this.hitPosition[i]) {
+                    let m = this.getHitImage(i, y)
+                    m.x = x
+                    m.update()
+                    m.draw()
+                    if (m.dead) {
+                        delete this.hitPosition[i]
+                        delete this.hitImages[i]
+                    }
+                } else {
+                    image.x = x
+                    image.y = y
+                    image.draw()
+                }
             }
         }
     }

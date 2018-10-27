@@ -9,27 +9,23 @@ class Mario extends GuaAnimation {
         this.x = 100
         this.y = 352
         this.interval = 6
-        this.speed = 5
+        // 垂直方向的速度和加速度
         this.vy = 0
         this.ay = 9
         this.gy = 3.5
-        // 加速和摩擦
+        // 水平方向的速度和加速度
         this.vx = 0
         this.ax = 0
         this.mx = 0
-        //  空中和地面所受的摩擦力
-        // this.mxValues = {
-        //     'move': 0.9,
-        //     'jump': 0.3,
-        // }
         // 最大速度
         this.maxSpeed = 8
-        // this.jumpCount = 75
+        // 跳跃控制
         this.keyUp = true
-        this.canJump = true
         this.jumpMove = true
         this.jumpCount = 9
+        // 马里奥的状态
         this.status = 'idle'
+        // 图片
         this.imagesPerStatus = {
             idle: GuaImage.new(this.game, 'mario_idle'),
             move: GuaImage.new(this.game, 'mario_move'),
@@ -37,9 +33,11 @@ class Mario extends GuaAnimation {
             turn: GuaImage.new(this.game, 'mario_turn')
         }
         this.img = this.imagesPerStatus[this.status]
+        // 其它控制参数
         this.tileSize = this.map.tileSize
         this.hitStatus = 'move'
         this.hit = false
+        this.paused = false
     }
     onTheGround() {
         // 左下角
@@ -47,7 +45,7 @@ class Mario extends GuaAnimation {
         // 右下角
         let i2 = Math.floor((this.x + this.offsetX - 2) / this.tileSize) + 1
         let j = Math.floor(this.y / this.tileSize) + 2
-        let result = this.map.hitObstacle(i1, j) || this.map.hitObstacle(i2, j)
+        let result = this.map.collision(i1, j) || this.map.collision(i2, j)
         return result
     }
     //  跳起碰到砖块
@@ -57,7 +55,7 @@ class Mario extends GuaAnimation {
         // 右上角
         let i2 = Math.floor((this.x + this.offsetX - 2) / this.tileSize) + 1
         let j = Math.floor(this.y / this.tileSize)
-        let result = this.map.hitObstacle(i1, j) || this.map.hitObstacle(i2, j)
+        let result = this.map.collisionFromDown(i1, j) || this.map.collisionFromDown(i2, j)
         return result
     }
     // 向左走碰撞
@@ -66,7 +64,7 @@ class Mario extends GuaAnimation {
         let j1 = Math.floor(this.y / this.tileSize)
         let j2 = Math.floor(this.y / this.tileSize) + 1
         let j3 = Math.floor((this.y - 2) / this.tileSize) + 2
-        let result = this.map.hitObstacle(i, j1) || this.map.hitObstacle(i, j2) || this.map.hitObstacle(i, j3)
+        let result = this.map.collision(i, j1) || this.map.collision(i, j2) || this.map.collision(i, j3)
         // if (result) {
         //     this.x = i * this.tileSize - this.offsetX
         // }
@@ -78,7 +76,7 @@ class Mario extends GuaAnimation {
         let j1 = Math.floor(this.y / this.tileSize)
         let j2 = Math.floor(this.y / this.tileSize) + 1
         let j3 = Math.floor((this.y - 2) / this.tileSize) + 2
-        let result = this.map.hitObstacle(i, j1) || this.map.hitObstacle(i, j2) || this.map.hitObstacle(i, j3)
+        let result = this.map.collision(i, j1) || this.map.collision(i, j2) || this.map.collision(i, j3)
         if (result) {
             this.x = (i - 1) * this.tileSize - this.offsetX
         }
@@ -89,11 +87,15 @@ class Mario extends GuaAnimation {
         if (onTheGround && this.vy >= 0) {
             this.vy = 0
             this.y = Math.floor(this.y / this.tileSize) * this.tileSize
-            this.canJump = this.keyUp
-            this.jumpMove = true
             this.hit = this.hitStatus == 'jump'
+            this.paused = false
+            if (this.keyUp) {
+                this.ay = 9
+            }
+            if (this.vy > 0) {
+                this.ay = 0
+            }
         } else if (this.hitWithHead()) {
-            log('hit head')
             this.vy = 5
             this.hit = this.hitStatus == 'jump'
             // let y = Math.floor(this.y / this.tileSize) * this.tileSize
@@ -101,9 +103,6 @@ class Mario extends GuaAnimation {
         } else {
             this.vy += this.gy
             this.vy = Math.min(this.vy, 20)
-            // if (this.onTheGround) {
-            //     this.y = (j - 2) * this.tileSize
-            // }
         }
     }
     //  更新水平方向受力
@@ -121,10 +120,11 @@ class Mario extends GuaAnimation {
         if (this.hit) {
             return
         }
-        if (this.hitLeft() && this.vx < 0) {
+        if (this.vx < 0 && this.hitLeft()) {
+            log('hit left')
             this.vx = 0
             // this.x = Math.floor(this.x / this.tileSize) * this.tileSize
-        } else if (this.hitRight() && this.vx > 0) {
+        } else if (this.vx > 0 && this.hitRight()) {
             this.vx = 0
         }
     }
@@ -169,10 +169,13 @@ class Mario extends GuaAnimation {
                 this.changeStatus('move')
             }
             this.hitStatus = 'move'
-        } else {
+        } else if (this.vy <= 0){
             this.changeStatus('jump')
             this.hitStatus = 'jump'
             // this.canJump = false
+        } else {
+            this.paused = true
+            this.hitStatus = 'jump'
         }
     }
     updateControl() {
@@ -180,7 +183,10 @@ class Mario extends GuaAnimation {
         this.jumpSpeed = control.jump_speed.value
     }
     update() {
-        super.update()
+        // 掉落时保持原有姿势
+        if (!this.paused) {
+            super.update()
+        }
         this.updateControl()
         // this.x = control.x.value
         // this.y = control.y.value
@@ -194,7 +200,7 @@ class Mario extends GuaAnimation {
         this.updateRub()
         this.updatePosition()
         this.updateStatus()
-        this.his = false
+        this.hit = false
     }
     draw() {
         var context = this.game.context
@@ -218,7 +224,6 @@ class Mario extends GuaAnimation {
     move(a, s) {
         if (this.status == 'jump') {
             if (this.jumpMove) {
-                log('jumpMove')
                 this.vx = this.vx || s
                 this.jumpMove = false
             }
@@ -246,15 +251,16 @@ class Mario extends GuaAnimation {
         if (keyStatus == 'down') {
             this.vy -= this.ay
             this.ay--
+            this.ay = Math.max(this.ay, 0)
             this.jumpMove = this.vx == 0
-            // this.keyUp = false
+            this.keyUp = false
             // if (this.canJump) {
             //     this.vy -= this.ay
             //     this.ay--
             //     this.jumpMove = this.vx == 0
             // }
         } else {
-            this.ay = 9
+            // this.ay = 9
             this.keyUp = true
             // this.jumpCount = 9
         }
